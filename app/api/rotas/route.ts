@@ -1,5 +1,15 @@
 import { BigQuery } from '@google-cloud/bigquery';
 import { NextResponse } from 'next/server';
+import { writeFileSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
+
+// Em produção (Vercel), escreve as credenciais em arquivo temporário
+if (process.env.GOOGLE_CREDENTIALS && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  const credPath = join(tmpdir(), 'gcp-credentials.json');
+  writeFileSync(credPath, process.env.GOOGLE_CREDENTIALS);
+  process.env.GOOGLE_APPLICATION_CREDENTIALS = credPath;
+}
 
 const bigquery = new BigQuery({ projectId: 'meli-bi-data' });
 
