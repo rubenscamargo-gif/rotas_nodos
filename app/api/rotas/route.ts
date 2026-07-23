@@ -4,10 +4,17 @@ import { writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
-// Em produção (Vercel), escreve as credenciais em arquivo temporário
-if (process.env.GOOGLE_CREDENTIALS && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+// Em produção (Vercel), monta credenciais a partir das env vars individuais
+if (process.env.GOOGLE_CLIENT_ID && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  const creds = {
+    type: 'authorized_user',
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+    universe_domain: 'googleapis.com',
+  };
   const credPath = join(tmpdir(), 'gcp-credentials.json');
-  writeFileSync(credPath, process.env.GOOGLE_CREDENTIALS);
+  writeFileSync(credPath, JSON.stringify(creds));
   process.env.GOOGLE_APPLICATION_CREDENTIALS = credPath;
 }
 
